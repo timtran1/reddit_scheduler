@@ -2,8 +2,14 @@ import sqlite3
 from flask import Flask, send_from_directory, request
 from dict_factory import dict_factory
 import json
+import logging
 
 app = Flask(__name__)
+gunicorn_logger = logging.getLogger('gunicorn.error')
+app.logger.handlers = gunicorn_logger.handlers
+app.logger.setLevel(gunicorn_logger.level)
+
+
 with sqlite3.connect("database.db") as con:
     cur = con.cursor()
     cur.execute('''CREATE TABLE IF NOT EXISTS post
@@ -43,10 +49,12 @@ def posts_update():
         cur = con.cursor()
 
         for field in vals.keys():
-            query = "UPDATE post SET %s = '%s' WHERE rowid = %s;" % (field, vals[field], id)
-            # print(query)
             cur.execute(
-                query
+                'UPDATE post SET %s = :value WHERE rowid = :id' % field,
+                {
+                    'value': vals[field],
+                    'id': id
+                }
             )
 
     return '1'
@@ -58,10 +66,11 @@ def posts_delete():
     with sqlite3.connect("database.db") as con:
         cur = con.cursor()
         cur.execute(
-            "DELETE FROM post WHERE rowid = %s" % id
+            "DELETE FROM post WHERE rowid = ?", (id)
         )
 
     return '1'
 
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', debug=True)  # dev server only

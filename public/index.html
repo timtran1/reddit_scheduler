@@ -18,12 +18,12 @@
             width: 100%;
         }
 
-        input:focus,textarea:focus {
+        input:focus, textarea:focus {
             outline: none;
         }
 
         input[type="datetime-local"] {
-            width: 180px;
+            width: 185px;
         }
 
 
@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-3">
                     <!--                    <input type="text" v-model="post.selftext" @change="update(post.rowid, 'selftext')">-->
-                    <textarea v-model="post.selftext"  @change="update(post.rowid, 'selftext')" rows="1"></textarea>
+                    <textarea v-model="post.selftext" @change="update(post.rowid, 'selftext')" rows="1"></textarea>
                 </div>
                 <div class="col-2">
                     <input type="text" v-model="post.subreddit" @change="update(post.rowid, 'subreddit')">
@@ -66,8 +66,12 @@
                 <div class="col-1">
                     <span
                             class="badge"
-                            :class="{ 'bg-success': post.status === 'Submitted', 'bg-primary': post.status === 'Scheduled' }">
-                        {{post.status}}
+                            :class="{
+                            'bg-success': post.status === 'Submitted',
+                            'bg-primary': post.status === 'Scheduled',
+                            'bg-danger': post.status === 'Error',
+                            }">
+                        {{ post.status }}
                     </span>
                 </div>
                 <div class="col-1"><a style="color: #ccc" @click="remove(post.rowid)"><i class="fas fa-trash"></i></a>
@@ -87,7 +91,7 @@
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 
 <script>
 

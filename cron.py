@@ -4,8 +4,9 @@ from dict_factory import dict_factory
 import traceback
 import praw
 import os
+from tzlocal import get_localzone
 
-now = datetime.datetime.now()
+now = datetime.datetime.now().astimezone(get_localzone())
 print('Checking posting schedule - %s' % str(now))
 
 with sqlite3.connect("database.db") as con:
@@ -13,6 +14,7 @@ with sqlite3.connect("database.db") as con:
     cur = con.cursor()
     cur.execute("SELECT rowid,* FROM post WHERE status != 'Submitted' ")
     posts = cur.fetchall()
+    print('%s scheduled posts found.' % str(len(posts)))
 
 if posts:
     reddit = praw.Reddit(
@@ -26,7 +28,8 @@ if posts:
     for post in posts:
         try:
             if post['schedule_date']:
-                schedule_date = datetime.datetime.strptime(post['schedule_date'], '%Y-%m-%dT%H:%M')
+                schedule_date = datetime.datetime.strptime(post['schedule_date'], '%Y-%m-%dT%H:%M').astimezone(get_localzone())
+                print('Post "%s" is scheduled for %s.' % (post['title'], str(schedule_date)))
                 if now > schedule_date:
                     print('SUBMITTING "%s"' % post['title'])
                     subreddit = reddit.subreddit(post['subreddit'])
@@ -35,9 +38,20 @@ if posts:
                         selftext=post['selftext']
                     )
 
+                    with sqlite3.connect("database.db") as con:
+                        cur = con.cursor()
+                        cur.execute(
+                            "UPDATE post SET status = 'Submitted' WHERE rowid = %s;" % post['rowid']
+                        )
+
+            else:
+                print('Post "%s" does not have a date.' % post['title'])
+
         except Exception:
             print(post)
             print(traceback.format_exc())
-
-else:
-    print('No posts found.')
+            with sqlite3.connect("database.db") as con:
+                cur = con.cursor()
+                cur.execute(
+                    "UPDATE post SET status = 'Error' WHERE rowid = %s;" % post['rowid']
+                )

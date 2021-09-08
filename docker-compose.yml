@@ -11,3 +11,4 @@ services:
       - .env
     volumes:
       - ./database.db:/usr/app/database.db
+      - /etc/localtime:/etc/localtime:ro

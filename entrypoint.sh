@@ -1,4 +1,4 @@
 #!/bin/sh
 
 crond &
-python main.py
+gunicorn --bind 0.0.0.0:5000 main:app
