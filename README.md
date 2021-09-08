@@ -6,6 +6,8 @@ Schedule posts for Reddit using a GUI.
 
 *Note: the scheduler is a cron job inside the Docker container, so your Docker daemon should be running 24/7 for this to work.*
 
+*Mac and Linux only*
+
 
 ## Preqs
 Create a Reddit app [here](https://www.reddit.com/prefs/apps). 
