@@ -24,6 +24,7 @@ if posts:
         username=os.environ.get('USERNAME'),
         password=os.environ.get('PASSWORD')
     )
+    reddit.validate_on_submit = True
 
     for post in posts:
         try:
