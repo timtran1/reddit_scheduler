@@ -4,7 +4,7 @@ Schedule posts for Reddit using a GUI.
 
 ![demo](https://i.ibb.co/jM4xxCY/rsz-31screen-shot-2021-09-09-at-031901.png)
 
-[Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) are required to run this app.
+[Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) are required to run
 
 *Note: the scheduler is a cron job inside the Docker container, so your Docker daemon should be running 24/7 for this to work.*
 
