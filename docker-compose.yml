@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  reddit_scheduler:
+    build: .
+    container_name: reddit_scheduler
+    restart: always
+    ports:
+      - 5000:5000
+    env_file:
+      - .env
+    volumes:
+      - ./database.db:/usr/app/database.db

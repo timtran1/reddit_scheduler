@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reddit Scheduler</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/d097e88e4a.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" sizes="16x16"
+          href="https://www.redditstatic.com/desktop2x/img/favicon/favicon-16x16.png">
+    <style>
+        b {
+            color: gray;
+        }
+
+        input, textarea {
+            border: 0;
+            width: 100%;
+        }
+
+        input:focus,textarea:focus {
+            outline: none;
+        }
+
+        input[type="datetime-local"] {
+            width: 180px;
+        }
+
+
+        a {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="row d-flex justify-content-center" id="app">
+    <div class="col-md-10">
+        <div class="p-5">
+            <h2 class="mb-5">Posts</h2>
+
+            <div class="row d-flex justify-content-center mb-4">
+                <div class="col-2"><b>Title</b></div>
+                <div class="col-3"><b>Selftext</b></div>
+                <div class="col-2"><b>Subreddit</b></div>
+                <div class="col-3"><b>Date</b></div>
+                <div class="col-1"><b>Status</b></div>
+                <div class="col-1"></div>
+            </div>
+            <hr>
+
+            <div class="row d-flex justify-content-center mt-4" v-for="post in posts">
+                <div class="col-2">
+                    <input type="text" v-model="post.title" @change="update(post.rowid, 'title')">
+                </div>
+                <div class="col-3">
+                    <!--                    <input type="text" v-model="post.selftext" @change="update(post.rowid, 'selftext')">-->
+                    <textarea v-model="post.selftext"  @change="update(post.rowid, 'selftext')" rows="1"></textarea>
+                </div>
+                <div class="col-2">
+                    <input type="text" v-model="post.subreddit" @change="update(post.rowid, 'subreddit')">
+                </div>
+                <div class="col-3">
+                    <input type="datetime-local" v-model="post.schedule_date"
+                           @change="update(post.rowid, 'schedule_date')"/>
+                </div>
+                <div class="col-1">
+                    <span
+                            class="badge"
+                            :class="{ 'bg-success': post.status === 'Submitted', 'bg-primary': post.status === 'Scheduled' }">
+                        {{post.status}}
+                    </span>
+                </div>
+                <div class="col-1"><a style="color: #ccc" @click="remove(post.rowid)"><i class="fas fa-trash"></i></a>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-light mt-4 float-right" style="border-radius: 0.5rem;" @click="create">
+                +
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            posts: []
+        },
+        created: function () {
+            let self = this
+            $.get('/posts', function (data) {
+                self.posts = JSON.parse(data)
+            });
+        },
+        methods: {
+            create() {
+                let self = this
+                $.get('/posts/create', function (data) {
+                    if (data === '1') {
+                        $.get('/posts', function (data) {
+                            self.posts = JSON.parse(data)
+                        });
+                    }
+                });
+            },
+            update(id, field) {
+                let rec = this.posts.filter(post => post.rowid === id)[0]
+                let vals = {}
+                vals[field] = rec[field]
+
+                $.get(`/posts/update?id=${id}&vals=${JSON.stringify(vals)}`, function (data) {
+                    console.log(data)
+                });
+            },
+            remove(id) {
+                let self = this
+                $.get(`/posts/delete?id=${id}`, function (data) {
+                    if (data === '1') {
+                        $.get('/posts', function (data) {
+                            self.posts = JSON.parse(data)
+                        });
+                    }
+                });
+            }
+        }
+    })
+
+</script>
+</body>
+</html>
