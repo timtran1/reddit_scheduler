@@ -66,7 +66,7 @@ def posts_delete():
     with sqlite3.connect("database.db") as con:
         cur = con.cursor()
         cur.execute(
-            "DELETE FROM post WHERE rowid = ?", (id)
+            "DELETE FROM post WHERE rowid = :id", {'id': id}
         )
 
     return '1'
