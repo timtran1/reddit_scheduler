@@ -64,8 +64,10 @@
                            @change="update(post.rowid, 'schedule_date')"/>
                 </div>
                 <div class="col-1">
+
                     <span
                             class="badge"
+                            v-if="post.schedule_date"
                             :class="{
                             'bg-success': post.status === 'Submitted',
                             'bg-primary': post.status === 'Scheduled',
@@ -73,15 +75,30 @@
                             }">
                         {{ post.status }}
                     </span>
-                </div>
-                <div class="col-1"><a style="color: #ccc" @click="remove(post.rowid)"><i class="fas fa-trash"></i></a>
-                </div>
-            </div>
 
-            <button type="button" class="btn btn-light mt-4 float-right" style="border-radius: 0.5rem;" @click="create">
+                    <span
+                            v-else=""
+                            class="badge bg-secondary">
+                        Unscheduled
+                    </span>
+
+                </div>
+                <div class="col-1">
+                    <div class="col-1">
+                        <a style="color: #ccc" @click="unschedule(post.rowid)" title="Unschedule">
+                            <i class="fas fa-calendar-times"></i>
+                        </a>
+                        <a style="color: #ccc" @click="remove(post.rowid)" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <button type="button" class="btn btn-light mt-4 float-right" style="border-radius: 0.5rem;"
+                    @click="create">
                 +
             </button>
-
         </div>
     </div>
 </div>
@@ -125,6 +142,11 @@
                 $.get(`/posts/update?id=${id}&vals=${JSON.stringify(vals)}`, function (data) {
                     console.log(data)
                 });
+            },
+            unschedule(id) {
+                let post = this.posts.filter(post => post.rowid === id)[0]
+                post.schedule_date = null
+                this.update(id, 'schedule_date')
             },
             remove(id) {
                 let self = this
