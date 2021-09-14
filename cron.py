@@ -33,17 +33,19 @@ if posts:
                 print('Post "%s" is scheduled for %s.' % (post['title'], str(schedule_date)))
                 if now > schedule_date:
                     print('SUBMITTING "%s"' % post['title'])
-                    subreddit = reddit.subreddit(post['subreddit'])
-                    subreddit.submit(
-                        title=post['title'],
-                        selftext=post['selftext']
-                    )
 
-                    with sqlite3.connect("database.db") as con:
-                        cur = con.cursor()
-                        cur.execute(
-                            "UPDATE post SET status = 'Submitted' WHERE rowid = %s;" % post['rowid']
+                    if not os.environ.get('DEV_ENV'):
+                        subreddit = reddit.subreddit(post['subreddit'])
+                        subreddit.submit(
+                            title=post['title'],
+                            selftext=post['selftext'] or ' '
                         )
+
+                        with sqlite3.connect("database.db") as con:
+                            cur = con.cursor()
+                            cur.execute(
+                                "UPDATE post SET status = 'Submitted' WHERE rowid = %s;" % post['rowid']
+                            )
 
             else:
                 print('Post "%s" does not have a date.' % post['title'])
