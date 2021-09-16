@@ -38,7 +38,7 @@ if posts:
                         subreddit = reddit.subreddit(post['subreddit'])
                         subreddit.submit(
                             title=post['title'],
-                            selftext=post['selftext'] or ' '
+                            selftext=post['selftext']
                         )
 
                         with sqlite3.connect("database.db") as con:
